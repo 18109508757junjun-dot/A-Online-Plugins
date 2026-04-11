@@ -1,0 +1,5 @@
+---
+alwaysApply: true
+---
+
+void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);

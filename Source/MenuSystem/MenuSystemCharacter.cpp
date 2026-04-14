@@ -315,10 +315,10 @@ void AMenuSystemCharacter::OnJoinSessionComplete(FName SessionName, EOnJoinSessi
 	FString Address;
 	if(OnlineSessionInterface->GetResolvedConnectString(SessionName, Address))
 	{
-		if(GEngine)
+		/*if(GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Connect to: %s"), *Address));
-		}
+		}*/
 
 		APlayerController* PlayerController = GetGameInstance() ? GetGameInstance()->GetFirstLocalPlayerController() : nullptr;
 		if(PlayerController)

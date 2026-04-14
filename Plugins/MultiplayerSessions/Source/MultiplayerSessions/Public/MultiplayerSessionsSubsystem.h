@@ -10,6 +10,13 @@
 /**
  * 
  */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnCreateSessionComplete, bool, bWasSuccessful);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FMultiplayerOnFindSessionsComplete,const TArray<FOnlineSessionSearchResult> &SessionResults, bool bWasSuccessful);
+DECLARE_MULTICAST_DELEGATE_OneParam(FMultiplayerOnJoinSessionComplete, EOnJoinSessionCompleteResult::Type Result);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnDestroySessionComplete, bool, bWasSuccessful);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnStartSessionComplete, bool, bWasSuccessful);
+
 UCLASS()
 class MULTIPLAYERSESSIONS_API UMultiplayerSessionsSubsystem : public UGameInstanceSubsystem
 {
@@ -20,10 +27,16 @@ public:
 	UMultiplayerSessionsSubsystem();
 
 	void CreateSession(int32 NumPublicConnections, FString MatchType);//创建会话。接受一个连接人数和连接类型
-	void FindSessions(int32 MaxResults);//查找会话。接受一个最大结果数
+        void FindSessions(int32 MaxSearchResults);// 查找会话。接受一个最大结果数
 	void JoinSession(const FOnlineSessionSearchResult& SessionResult);//加入会话。接受一个会话搜索结果
 	void StartSession();//开始会话。
 	void DestroySession();//销毁会话。
+
+	FMultiplayerOnCreateSessionComplete MultiplayerOnCreateSessionComplete;
+	FMultiplayerOnFindSessionsComplete MultiplayerOnFindSessionsComplete;
+    FMultiplayerOnJoinSessionComplete MultiplayerOnJoinSessionComplete;
+    FMultiplayerOnDestroySessionComplete MultiplayerOnDestroySessionComplete;
+    FMultiplayerOnStartSessionComplete MultiplayerOnStartSessionComplete;
 	
 protected:
 
@@ -35,16 +48,22 @@ protected:
 
 private:
     IOnlineSessionPtr SessionInterface;//在线会话接口
+    TSharedPtr<FOnlineSessionSettings> LastSessionSettings; // 会话设置
+    TSharedPtr<FOnlineSessionSearch> LastSessionSearch;
 
-	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;创建会话完成委托
-	FDelegateHandle CreateSessionCompleteDelegateHandle;创建会话完成委托
-	FOnFindSessionsCompleteDelegate FindSessionsCompleteDelegate;查找会话完成委托
-	FDelegateHandle FindSessionsCompleteDelegateHandle;查找会话完成委托句柄
-	FOnJoinSessionCompleteDelegate JoinSessionCompleteDelegate;加入会话完成委托
-	FDelegateHandle JoinSessionCompleteDelegateHandle;加入会话完成委托句柄
-	FOnDestroySessionCompleteDelegate DestroySessionCompleteDelegate;销毁会话完成委托
-	FDelegateHandle DestroySessionCompleteDelegateHandle;销毁会话完成委托句柄
-	FOnStartSessionCompleteDelegate StartSessionCompleteDelegate;开始会话完成委托
-	FDelegateHandle StartSessionCompleteDelegateHandle;开始会话完成委托句柄
+	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
+    FDelegateHandle CreateSessionCompleteDelegateHandle;
+    FOnFindSessionsCompleteDelegate FindSessionsCompleteDelegate;
+    FDelegateHandle FindSessionsCompleteDelegateHandle;
+    FOnJoinSessionCompleteDelegate JoinSessionCompleteDelegate;
+    FDelegateHandle JoinSessionCompleteDelegateHandle;
+    FOnDestroySessionCompleteDelegate DestroySessionCompleteDelegate;
+    FDelegateHandle DestroySessionCompleteDelegateHandle;
+    FOnStartSessionCompleteDelegate StartSessionCompleteDelegate;
+    FDelegateHandle StartSessionCompleteDelegateHandle;
+
+	bool bCreateSessionOnDestroy{false};
+    int32 LastNumPublicConnections;
+    FString LastMatchType;
 	
 };
